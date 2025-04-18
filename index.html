@@ -1,1 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logiq - Debate Learning Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        logiq: {
+                            red: '#ff3131',
+                            blue: '#014aad',
+                            'red-dark': '#cc2727',
+                            'blue-dark': '#013a8a',
+                            'gray-light': '#f9fafb',
+                            'gray-dark': '#1f2937'
+                        }
+                    },
+                    animation: {
+                        'progress': 'progress 1s ease-in-out'
+                    },
+                    keyframes: {
+                        progress: {
+                            '0%': { width: '0%' },
+                            '100%': { width: 'var(--progress-width)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease;
+        }
+        
+        .progress-bar {
+            --progress-width: 0%;
+            position: relative;
+        }
+        
+        .progress-bar-fill {
+            position: absolute;
+            height: 100%;
+            width: var(--progress-width);
+            animation: progress 1s ease-in-out;
+        }
+        
+        .module-card:hover .arrow-icon {
+            transform: translateX(5px);
+        }
+        
+        .quiz-option:hover:not(.selected) {
+            background-color: rgba(1, 74, 173, 0.1);
+        }
+        
+        .quiz-option.selected {
+            background-color: rgba(1, 74, 173, 0.2);
+            border-color: #014aad;
+        }
+        
+        .dark .quiz-option:hover:not(.selected) {
+            background-color: rgba(1, 74, 173, 0.2);
+        }
+        
+        .dark .quiz-option.selected {
+            background-color: rgba(1, 74, 173, 0.3);
+            border-color: #4d8be1;
+        }
+        
+        #quizContainer, #videoLesson, #coursesView {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-logiq-gray-dark text-gray-900 dark:text-gray-100 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="flex items-center space-x-1">
+                            <span class="text-logiq-blue dark:text-blue-400 font-bold text-3xl">Logi</span>
+                            <span class="text-logiq-red dark:text-red-400 font-bold text-3xl">q</span>
+                        </div>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="#" class="border-b-2 border-logiq-blue dark:border-blue-400 text-gray-900 dark:text-white inline-flex items-center px-1 pt-1 text-sm font-medium" id="dashboardLink">
+                            Dashboard
+                        </a>
+                        <a href="#" class="border-b-2 border-transparent hover:border-gray-300 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium" id="coursesLink">
+                            Courses
+                        </a>
+                        <a href="#" class="border-b-2 border-transparent hover:border-gray-300 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium">
+                            Resources
+                        </a>
+                        <a href="#" class="border-b-2 border-transparent hover:border-gray-300 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium">
+                            Community
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button id="darkModeToggle" class="p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </button>
+                    <div class="ml-3 relative">
+                        <div>
+                            <button type="button" class="bg-white dark:bg-gray-800 rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-logiq-blue dark:focus:ring-blue-400" id="user-menu-button">
+                                <span class="sr-only">Open user menu</span>
+                                <div class="h-8 w-8 rounded-full bg-logiq-blue dark:bg-blue-600 text-white flex items-center justify-center">
+                                    <span class="font-semibold">JS</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="ml-3 md:hidden">
+                        <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-logiq-blue dark:focus:ring-blue-400" id="mobile-menu-button">
+                            <span class="sr-only">Open main menu</span>
+                            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu, show/hide based on menu state -->
+        <div class="hidden md:hidden" id="mobile-menu">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#" class="bg-logiq-blue dark:bg-blue-700 text-white block pl-3 pr-4 py-2 text-base font-medium" id="mobileDashboardLink">Dashboard</a>
+                <a href="#" class="text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-logiq-blue dark:hover:text-blue-400 block pl-3 pr-4 py-2 text-base font-medium" id="mobileCoursesLink">Courses</a>
+                <a href="#" class="text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-logiq-blue dark:hover:text-blue-400 block pl-3 pr-4 py-2 text-base font-medium">Resources</a>
+                <a href="#" class="text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-logiq-blue dark:hover:text-blue-400 block pl-3 pr-4 py-2 text-base font-medium">Community</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Dashboard View -->
+        <div id="dashboardView" class="space-y-8">
+            <!-- Welcome Banner -->
+            <section class="bg-gradient-to-r from-logiq-blue to-logiq-red dark:from-blue-800 dark:to-red-800 rounded-xl text-white p-6 md:p-8 shadow-lg">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold">Welcome back, John!</h1>
+                        <p class="mt-2 text-white/80">Continue your debate training journey.</p>
+                    </div>
+                    <button class="mt-4 md:mt-0 px-4 py-2 bg-white text-logiq-blue font-semibold rounded-md hover:bg-gray-100 transition">Resume Learning</button>
+                </div>
+            </section>
+            
+            <!-- Progress Overview -->
+            <section>
+                <h2 class="text-xl font-semibold mb-4">Your Progress</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Public Forum Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-medium text-lg">Public Forum Debate</h3>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">Intermediate Level</p>
+                            </div>
+                            <span class="text-logiq-blue dark:text-blue-400 font-semibold">65%</span>
+                        </div>
+                        <div class="mt-3 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden progress-bar">
+                            <div class="bg-logiq-blue dark:bg-blue-600 h-full rounded-full progress-bar-fill" style="--progress-width: 65%"></div>
+                        </div>
+                        <div class="mt-4 flex justify-between items-center">
+                            <div>
+                                <p class="text-sm">Last activity: <span class="text-gray-500 dark:text-gray-400">Yesterday</span></p>
+                            </div>
+                            <button class="text-sm font-medium text-logiq-blue dark:text-blue-400 hover:underline focus:outline-none" data-course="public-forum">Continue</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Congressional Debate Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-medium text-lg">Congressional Debate</h3>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">Beginner Level</p>
+                            </div>
+                            <span class="text-logiq-blue dark:text-blue-400 font-semibold">30%</span>
+                        </div>
+                        <div class="mt-3 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden progress-bar">
+                            <div class="bg-logiq-blue dark:bg-blue-600 h-full rounded-full progress-bar-fill" style="--progress-width: 30%"></div>
+                        </div>
+                        <div class="mt-4 flex justify-between items-center">
+                            <div>
+                                <p class="text-sm">Last activity: <span class="text-gray-500 dark:text-gray-400">3 days ago</span></p>
+                            </div>
+                            <button class="text-sm font-medium text-logiq-blue dark:text-blue-400 hover:underline focus:outline-none" data-course="congressional">Continue</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Recent Lessons -->
+            <section>
+                <h2 class="text-xl font-semibold mb-4">Recent Lessons</h2>
+                <div class="overflow-hidden bg-white dark:bg-gray-800 shadow-md rounded-lg border border-gray-200 dark:border-gray-700">
+                    <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <li class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" data-course="public-forum" data-module="2" data-lesson="1">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-logiq-blue dark:bg-blue-700 flex items-center justify-center text-white">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium">Constructing Effective Arguments</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Public Forum Debate • Module 2</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 mr-2">10 min</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 arrow-icon transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" data-course="congressional" data-module="1" data-lesson="3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-logiq-red dark:bg-red-700 flex items-center justify-center text-white">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium">Parliamentary Procedure Basics</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Congressional Debate • Module 1</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 mr-2">15 min</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 arrow-icon transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" data-course="public-forum" data-module="2" data-lesson="2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-logiq-blue dark:bg-blue-700 flex items-center justify-center text-white">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium">Cross-Examination Strategies</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Public Forum Debate • Module 2</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 mr-2">8 min</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 arrow-icon transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+            
+            <!-- Quiz Achievements -->
+            <section>
+                <h2 class="text-xl font-semibold mb-4">Recent Quiz Results</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                        <h3 class="font-medium">Public Forum Basics</h3>
+                        <div class="mt-2 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="ml-1 text-sm">Score: 85%</span>
+                        </div>
+                        <button class="mt-3 text-xs text-logiq-blue dark:text-blue-400 hover:underline">Review</button>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                        <h3 class="font-medium">Evidence Analysis</h3>
+                        <div class="mt-2 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="ml-1 text-sm">Score: 72%</span>
+                        </div>
+                        <button class="mt-3 text-xs text-logiq-blue dark:text-blue-400 hover:underline">Review</button>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                        <h3 class="font-medium">Congressional Procedures</h3>
+                        <div class="mt-2 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="ml-1 text-sm">Score: 90%</span>
+                        </div>
+                        <button class="mt-3 text-xs text-logiq-blue dark:text-blue-400 hover:underline">Review</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Courses View -->
+        <div id="coursesView" class="hidden space-y-8">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold">Available Courses</h1>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-500 dark:text-gray-400">View:</span>
+                    <button class="bg-gray-200 dark:bg-gray-700 p-2 rounded">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <button class="p-2 rounded">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Public Forum Course Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div class="h-40 bg-gradient-to-r from-logiq-blue to-blue-400 dark:from-blue-700 dark:to-blue-500 relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white/90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h2 class="text-xl font-bold">Public Forum Debate</h2>
+                                <p class="text-gray-500 dark:text-gray-400 mt-1">Master the art of collaborative debate</p>
+                            </div>
+                            <span class="bg-logiq-blue/10 dark:bg-blue-900/30 text-logiq-blue dark:text-blue-400 text-xs font-semibold px-2.5 py-0.5 rounded">Intermediate</span>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                8 weeks • 24 lessons
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                12 quizzes • 4 practice debates
+                            </div>
+                        </div>
+                        <div class="mt-5 flex justify-between items-center">
+                            <div class="text-sm">
+                                <div class="text-logiq-blue dark:text-blue-400 font-medium">65% complete</div>
+                                <div class="w-32 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mt-1">
+                                    <div class="h-full bg-logiq-blue dark:bg-blue-600 rounded-full" style="width: 65%"></div>
+                                </div>
+                            </div>
+                            <button class="bg-logiq-blue hover:bg-logiq-blue-dark dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-4 py-2 rounded-md transition" data-course="public-forum">Continue</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Congressional Debate Course Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div class="h-40 bg-gradient-to-r from-logiq-red to-red-400 dark:from-red-700 dark:to-red-500 relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white/90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h2 class="text-xl font-bold">Congressional Debate</h2>
+                                <p class="text-gray-500 dark:text-gray-400 mt-1">Legislative debate in a congressional setting</p>
+                            </div>
+                            <span class="bg-logiq-red/10 dark:bg-red-900/30 text-logiq-red dark:text-red-400 text-xs font-semibold px-2.5 py-0.5 rounded">Beginner</span>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                10 weeks • 30 lessons
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                15 quizzes • 5 bill drafting exercises
+                            </div>
+                        </div>
+                        <div class="mt-5 flex justify-between items-center">
+                            <div class="text-sm">
+                                <div class="text-logiq-red dark:text-red-400 font-medium">30% complete</div>
+                                <div class="w-32 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mt-1">
+                                    <div class="h-full bg-logiq-red dark:bg-red-600 rounded-full" style="width: 30%"></div>
+                                </div>
+                            </div>
+                            <button class="bg-logiq-red hover:bg-logiq-red-dark dark:bg-red-600 dark:hover:bg-red-700 text-white px-4 py-2 rounded-md transition" data-course="congressional">Continue</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Course Modules (Public Forum) -->
+            <div id="publicForumModules" class="hidden space-y-6">
+                <div class="flex items-center space-x-2">
+                    <button id="backToCourses" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <h1 class="text-2xl font-bold">Public Forum Debate</h1>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400">Master the art of collaborative debate with a partner, focusing on current events and policy issues. This course prepares you for competitive Public Forum debate tournaments.</p>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-semibold">Course Progress</h2>
+                    <div class="mt-2 h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div class="bg-logiq-blue dark:bg-blue-600 h-full rounded-full" style="width: 65%"></div>
+                    </div>
+                    <div class="mt-1 flex justify-between text-sm">
+                        <span>65% complete</span>
+                        <span>15/24 lessons</span>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Module 1 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <div class="p-4 flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold text-lg">Module 1: Introduction to Public Forum</h3>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Understanding the format and basic structure</p>
+                            </div>
+                            <span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">Completed</span>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-850 border-t border-gray-200 dark:border-gray-700 px-4 py-3">
+                            <button class="text-logiq-blue dark:text-blue-400 hover:underline text-sm font-medium">Review Materials</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Module 2 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <div class="p-4 flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold text-lg">Module 2: Building Arguments</h3>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Constructing effective arguments and cross-examination</p>
+                            </div>
+                            <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full">In Progress</span>
+                        </div>
+                        <div class="border-t border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
+                            <div class="px-4 py-3 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer" data-course="public-forum" data-module="2" data-lesson="1">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white mr-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <span>Constructing Effective Arguments</span>
+                                </div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                            <div class="px-4 py-3 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer" data-course="public-forum" data-module="2" data-lesson="2">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white mr-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <span>Cross-Examination Strategies</span>
+                                </div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                            <div class="px-4 py-3 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer" data-course="public-forum" data-module="2" data-lesson="3">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full bg-logiq-blue flex items-center justify-center text-white mr-3">
+                                        <span class="text-xs font-medium">3</span>
+                                    </div>
+                                    <span>Using Evidence and Citations</span>
+                                </div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                            <div class="px-4 py-3 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer" data-course="public-forum" data-module="2" data-lesson="quiz">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 mr-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <span>Module Quiz: Building Arguments</span>
+                                </div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-850 border-t border-gray-200 dark:border-gray-700 px-4 py-3">
+                            <button class="text-logiq-blue dark:text-blue-400 hover:underline text-sm font-medium">Continue Module</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Module 3 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <div class="p-4 flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold text-lg">Module 3: Refutation Techniques</h3>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Learning to identify and respond to opposing arguments</p>
+                            </div>
+                            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs rounded-full">Locked</span>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-850 border-t border-gray-200 dark:border-gray-700 px-4 py-3">
+                            <button class="text-gray-400 dark:text-gray-500 text-sm font-medium cursor-not-allowed">Complete Module 2 to Unlock</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Course Modules (Congressional) -->
+            <div id="congressionalModules" class="hidden space-y-6">
+                <div class="flex items-center space-x-2">
+                    <button class="backToCourses p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <h1 class="text-2xl font-bold">Congressional Debate</h1>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400">Learn legislative debate in a congressional setting, focusing on bill drafting, parliamentary procedure, and persuasive speaking.</p>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-semibold">Course Progress</h2>
+                    <div class="mt-2 h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div class="bg-logiq-red dark:bg-red-600 h-full rounded-full" style="width: 30%"></div>
+                    </div>
+                    <div class="mt-1 flex justify-between text-sm">
+                        <span>30% complete</span>
+                        <span>9/30 lessons</span>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Module 1 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <div class="p-4 flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold text-lg">Module 1: Introduction to Congressional Debate</h3>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Format, rules, and parliamentary procedure</p>
+                            </div>
+                            <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full">In Progress</span>
+                        </div>
+                        <div class="border-t border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
+                            <div class="px-4 py-3 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer" data-course="congressional" data-module="1" data-lesson="1">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white mr-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <span>Introduction to Congressional Debate Format</span>
+                                </div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                            <div class="px-4 py-3 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer" data-course="congressional" data-module="1" data-lesson="2">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white mr-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <span>Understanding Bills and Resolutions</span>
+                                </div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                            <div class="px-4 py-3 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer" data-course="congressional" data-module="1" data-lesson="3">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full bg-logiq-red flex items-center justify-center text-white mr-3">
+                                        <span class="text-xs font-medium">3</span>
+                                    </div>
+                                    <span>Parliamentary Procedure Basics</span>
+                                </div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                            <div class="px-4 py-3 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer" data-course="congressional" data-module="1" data-lesson="quiz">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 mr-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <span>Module Quiz: Introduction to Congressional Debate</span>
+                                </div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-850 border-t border-gray-200 dark:border-gray-700 px-4 py-3">
+                            <button class="text-logiq-red dark:text-red-400 hover:underline text-sm font-medium">Continue Module</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Module 2 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <div class="p-4 flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold text-lg">Module 2: Bill Drafting</h3>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Learning to write effective bills and resolutions</p>
+                            </div>
+                            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs rounded-full">Locked</span>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-850 border-t border-gray-200 dark:border-gray-700 px-4 py-3">
+                            <button class="text-gray-400 dark:text-gray-500 text-sm font-medium cursor-not-allowed">Complete Module 1 to Unlock</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lesson View -->
+        <div id="lessonView" class="hidden space-y-6">
+            <div class="flex items-center space-x-2">
+                <button id="backToModules" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <div>
+                    <h1 id="lessonTitle" class="text-2xl font-bold">Constructing Effective Arguments</h1>
+                    <p id="lessonSubtitle" class="text-gray-500 dark:text-gray-400">Public Forum Debate • Module 2 • Lesson 1</p>
+                </div>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
+                <div class="p-4">
+                    <div class="flex space-x-4">
+                        <button class="px-4 py-2 font-medium border-b-2 border-logiq-blue dark:border-blue-600 text-logiq-blue dark:text-blue-400">Video</button>
+                        <button class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">Transcript</button>
+                        <button class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">Resources</button>
+                    </div>
+                </div>
+                <div id="videoLesson" class="p-4 pt-0">
+                    <div class="aspect-w-16 aspect-h-9 mt-4 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                        <div class="text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p class="mt-2 text-gray-500 dark:text-gray-400">Video lesson will appear here</p>
+                            <button class="mt-4 bg-logiq-blue hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-4 py-2 rounded-md">Play Video</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="font-semibold text-lg mb-2">Lesson Overview</h3>
+                        <p class="text-gray-600 dark:text-gray-400">In this lesson, you'll learn how to construct effective arguments for Public Forum debate. We'll cover the components of a strong argument, including claims, warrants, and impacts, as well as how to organize your arguments for maximum persuasiveness.</p>
+                        
+                        <h4 class="font-semibold mt-4 mb-1">Key Learning Objectives:</h4>
+                        <ul class="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-1">
+                            <li>Understand the structure of an effective argument</li>
+                            <li>Learn to develop clear claims supported by evidence</li>
+                            <li>Practice creating logical warrants that connect evidence to claims</li>
+                            <li>Master the art of impacting arguments to demonstrate significance</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-6 flex space-x-2">
+                        <button id="showQuiz" class="flex-1 bg-logiq-blue hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-4 py-2 rounded-md">Take Quiz</button>
+                        <button class="flex-1 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md">Next Lesson</button>
+                    </div>
+                </div>
+                
+                <!-- Quiz Interface -->
+                <div id="quizContainer" class="p-4 pt-0 hidden">
+                    <div class="bg-gray-50 dark:bg-gray-750 rounded-lg p-4 mt-4">
+                        <h3 class="font-semibold text-lg mb-2">Lesson Quiz</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Test your understanding of constructing effective arguments.</p>
+                        
+                        <div class="space-y-4" id="quizQuestions">
+                            <!-- Question 1 -->
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                                <h4 class="font-medium mb-2">1. What are the three main components of an effective argument?</h4>
+                                <div class="space-y-2">
+                                    <div class="quiz-option border border-gray-300 dark:border-gray-600 rounded-md p-3 cursor-pointer transition" data-correct="true">
+                                        <span>Claim, Warrant, Impact</span>
+                                    </div>
+                                    <div class="quiz-option border border-gray-300 dark:border-gray-600 rounded-md p-3 cursor-pointer transition">
+                                        <span>Introduction, Body, Conclusion</span>
+                                    </div>
+                                    <div class="quiz-option border border-gray-300 dark:border-gray-600 rounded-md p-3 cursor-pointer transition">
+                                        <span>Thesis, Evidence, Rebuttals</span>
+                                    </div>
+                                    <div class="quiz-option border border-gray-300 dark:border-gray-600 rounded-md p-3 cursor-pointer transition">
+                                        <span>Proposition, Support, Summary</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Question 2 -->
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                                <h4 class="font-medium mb-2">2. Which of the following best describes the function of a warrant in an argument?</h4>
+                                <div class="space-y-2">
+                                    <div class="quiz-option border border-gray-300 dark:border-gray-600 rounded-md p-3 cursor-pointer transition">
+                                        <span>It states the main point you are trying to prove</span>
+                                    </div>
+                                    <div class="quiz-option border border-gray-300 dark:border-gray-600 rounded-md p-3 cursor-pointer transition">
+                                        <span>It provides factual information to support your position</span>
+                                    </div>
+                                    <div class="quiz-option border border-gray-300 dark:border-gray-600 rounded-md p-3 cursor-pointer transition" data-correct="true">
+                                        <span>It explains how the evidence supports your claim</span>
+                                    </div>
+                                    <div class="quiz-option border border-gray-300 dark:border-gray-600 rounded-md p-3 cursor-pointer transition">
+                                        <span>It explains why your argument matters in the larger context</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Question 3 -->
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                                <h4 class="font-medium mb-2">3. When developing impacts for your arguments, which of the following should you focus on?</h4>
+                                <div class="space-y-2">
+                                    <div class="quiz-option border border-gray-300 dark:border-gray-600 rounded-md p-3 cursor-pointer transition">
+                                        <span>The credentials of your sources</span>
+                                    </div>
+                                    <div class="quiz-option border border-gray-300 dark:border-gray-600 rounded-md p-3 cursor-pointer transition">
+                                        <span>The number of examples you can provide</span>
+                                    </div>
+                                    <div class="quiz-option border border-gray-300 dark:border-gray-600 rounded-md p-3 cursor-pointer transition">
+                                        <span>The complexity of your argument structure</span>
+                                    </div>
+                                    <div class="quiz-option border border-gray-300 dark:border-gray-600 rounded-md p-3 cursor-pointer transition" data-correct="true">
+                                        <span>The significance and consequences of your argument</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 flex justify-between">
+                            <button id="cancelQuiz" class="border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md">Go Back</button>
+                            <button id="submitQuiz" class="bg-logiq-blue hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-4 py-2 rounded-md">Submit Answers</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
+    <script>
+        // Initialize dark mode based on user preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+        
+        // DOM Elements
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const dashboardView = document.getElementById('dashboardView');
+        const coursesView = document.getElementById('coursesView');
+        const lessonView = document.getElementById('lessonView');
+        const publicForumModules = document.getElementById('publicForumModules');
+        const congressionalModules = document.getElementById('congressionalModules');
+        const videoLesson = document.getElementById('videoLesson');
+        const quizContainer = document.getElementById('quizContainer');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        
+        // Navigation Functions
+        function showDashboard() {
+            dashboardView.classList.remove('hidden');
+            coursesView.classList.add('hidden');
+            lessonView.classList.add('hidden');
+            publicForumModules.classList.add('hidden');
+            congressionalModules.classList.add('hidden');
+            
+            // Update active navigation links
+            document.querySelectorAll('nav a').forEach(link => {
+                link.classList.remove('border-logiq-blue', 'dark:border-blue-400', 'text-gray-900', 'dark:text-white', 'bg-logiq-blue', 'dark:bg-blue-700', 'text-white');
+                link.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-300', 'hover:border-gray-300', 'hover:text-gray-700', 'dark:hover:text-gray-200');
+            });
+            
+            document.getElementById('dashboardLink').classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-300');
+            document.getElementById('dashboardLink').classList.add('border-logiq-blue', 'dark:border-blue-400', 'text-gray-900', 'dark:text-white');
+            
+            document.getElementById('mobileDashboardLink').classList.remove('text-gray-600', 'dark:text-gray-300');
+            document.getElementById('mobileDashboardLink').classList.add('bg-logiq-blue', 'dark:bg-blue-700', 'text-white');
+        }
+        
+        function showCourses() {
+            dashboardView.classList.add('hidden');
+            coursesView.classList.remove('hidden');
+            lessonView.classList.add('hidden');
+            publicForumModules.classList.add('hidden');
+            congressionalModules.classList.add('hidden');
+            
+            // Update active navigation links
+            document.querySelectorAll('nav a').forEach(link => {
+                link.classList.remove('border-logiq-blue', 'dark:border-blue-400', 'text-gray-900', 'dark:text-white', 'bg-logiq-blue', 'dark:bg-blue-700', 'text-white');
+                link.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-300', 'hover:border-gray-300', 'hover:text-gray-700', 'dark:hover:text-gray-200');
+            });
+            
+            document.getElementById('coursesLink').classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-300');
+            document.getElementById('coursesLink').classList.add('border-logiq-blue', 'dark:border-blue-400', 'text-gray-900', 'dark:text-white');
+            
+            document.getElementById('mobileCoursesLink').classList.remove('text-gray-600', 'dark:text-gray-300');
+            document.getElementById('mobileCoursesLink').classList.add('bg-logiq-blue', 'dark:bg-blue-700', 'text-white');
+        }
+        
+        function showPublicForumModules() {
+            dashboardView.classList.add('hidden');
+            coursesView.classList.remove('hidden');
+            lessonView.classList.add('hidden');
+            publicForumModules.classList.remove('hidden');
+            congressionalModules.classList.add('hidden');
+        }
+        
+        function showCongressionalModules() {
+            dashboardView.classList.add('hidden');
+            coursesView.classList.remove('hidden');
+            lessonView.classList.add('hidden');
+            publicForumModules.classList.add('hidden');
+            congressionalModules.classList.remove('hidden');
+        }
+        
+        function showLesson(course, module, lesson) {
+            dashboardView.classList.add('hidden');
+            coursesView.classList.add('hidden');
+            lessonView.classList.remove('hidden');
+            publicForumModules.classList.add('hidden');
+            congressionalModules.classList.add('hidden');
+            
+            // Reset lesson view (show video, hide quiz)
+            videoLesson.classList.remove('hidden');
+            quizContainer.classList.add('hidden');
+            
+            // Update lesson title based on the selected lesson
+            const lessonTitle = document.getElementById('lessonTitle');
+            const lessonSubtitle = document.getElementById('lessonSubtitle');
+            
+            if (course === 'public-forum') {
+                if (module === '2') {
+                    if (lesson === '1') {
+                        lessonTitle.textContent = 'Constructing Effective Arguments';
+                        lessonSubtitle.textContent = 'Public Forum Debate • Module 2 • Lesson 1';
+                    } else if (lesson === '2') {
+                        lessonTitle.textContent = 'Cross-Examination Strategies';
+                        lessonSubtitle.textContent = 'Public Forum Debate • Module 2 • Lesson 2';
+                    } else if (lesson === '3') {
+                        lessonTitle.textContent = 'Using Evidence and Citations';
+                        lessonSubtitle.textContent = 'Public Forum Debate • Module 2 • Lesson 3';
+                    } else if (lesson === 'quiz') {
+                        lessonTitle.textContent = 'Module Quiz: Building Arguments';
+                        lessonSubtitle.textContent = 'Public Forum Debate • Module 2';
+                        // Show quiz directly for quiz lessons
+                        videoLesson.classList.add('hidden');
+                        quizContainer.classList.remove('hidden');
+                    }
+                }
+            } else if (course === 'congressional') {
+                if (module === '1') {
+                    if (lesson === '1') {
+                        lessonTitle.textContent = 'Introduction to Congressional Debate Format';
+                        lessonSubtitle.textContent = 'Congressional Debate • Module 1 • Lesson 1';
+                    } else if (lesson === '2') {
+                        lessonTitle.textContent = 'Understanding Bills and Resolutions';
+                        lessonSubtitle.textContent = 'Congressional Debate • Module 1 • Lesson 2';
+                    } else if (lesson === '3') {
+                        lessonTitle.textContent = 'Parliamentary Procedure Basics';
+                        lessonSubtitle.textContent = 'Congressional Debate • Module 1 • Lesson 3';
+                    } else if (lesson === 'quiz') {
+                        lessonTitle.textContent = 'Module Quiz: Introduction to Congressional Debate';
+                        lessonSubtitle.textContent = 'Congressional Debate • Module 1';
+                        // Show quiz directly for quiz lessons
+                        videoLesson.classList.add('hidden');
+                        quizContainer.classList.remove('hidden');
+                    }
+                }
+            }
+        }
+        
+        // Event Listeners
+        darkModeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+        
+        document.getElementById('dashboardLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            showDashboard();
+        });
+        
+        document.getElementById('mobileDashboardLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            showDashboard();
+            mobileMenu.classList.add('hidden');
+        });
+        
+        document.getElementById('coursesLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            showCourses();
+        });
+        
+        document.getElementById('mobileCoursesLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            showCourses();
+            mobileMenu.classList.add('hidden');
+        });
+        
+        document.getElementById('backToModules').addEventListener('click', () => {
+            // Check which course was being viewed and go back to that module
+            const lessonTitle = document.getElementById('lessonTitle').textContent;
+            if (lessonTitle.includes('Public Forum')) {
+                showPublicForumModules();
+            } else {
+                showCongressionalModules();
+            }
+        });
+        
+        document.getElementById('backToCourses').addEventListener('click', () => {
+            showCourses();
+        });
+        
+        document.querySelectorAll('.backToCourses').forEach(btn => {
+            btn.addEventListener('click', () => {
+                showCourses();
+            });
+        });
+        
+        // Course continue buttons
+        document.querySelectorAll('[data-course]').forEach(element => {
+            element.addEventListener('click', () => {
+                const course = element.getAttribute('data-course');
+                const module = element.getAttribute('data-module');
+                const lesson = element.getAttribute('data-lesson');
+                
+                if (module && lesson) {
+                    // If module and lesson are provided, show the specific lesson
+                    showLesson(course, module, lesson);
+                } else {
+                    // Otherwise, show the course modules
+                    if (course === 'public-forum') {
+                        showPublicForumModules();
+                    } else if (course === 'congressional') {
+                        showCongressionalModules();
+                    }
+                }
+            });
+        });
+        
+        // Quiz interaction
+        document.getElementById('showQuiz').addEventListener('click', () => {
+            videoLesson.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+        });
+        
+        document.getElementById('cancelQuiz').addEventListener('click', () => {
+            videoLesson.classList.remove('hidden');
+            quizContainer.classList.add('hidden');
+        });
+        
+        document.querySelectorAll('.quiz-option').forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove selected class from siblings
+                const parent = option.parentElement;
+                parent.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked option
+                option.classList.add('selected');
+            });
+        });
+        
+        document.getElementById('submitQuiz').addEventListener('click', () => {
+            // Count correct answers
+            let correctCount = 0;
+            let totalQuestions = 0;
+            
+            document.querySelectorAll('#quizQuestions > div').forEach(question => {
+                totalQuestions++;
+                const selectedOption = question.querySelector('.quiz-option.selected');
+                if (selectedOption && selectedOption.getAttribute('data-correct') === 'true') {
+                    correctCount++;
+                }
+            });
+            
+            // Calculate score
+            const score = Math.round((correctCount / totalQuestions) * 100);
+            
+            // Show score in an alert (would normally be a modal in a real app)
+            alert(`Quiz completed! Your score: ${score}%\nCorrect answers: ${correctCount}/${totalQuestions}`);
+            
+            // Return to video lesson
+            videoLesson.classList.remove('hidden');
+            quizContainer.classList.add('hidden');
+        });
+        
+        // Mobile menu
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Initialize the app with the dashboard view
+        showDashboard();
+    </script>
+</body>
+</html>
